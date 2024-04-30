@@ -161,7 +161,10 @@ if __name__ == "__main__":
 
     命令行参数：
 
-    目录路径: 指定要压缩的图片所在的文件夹路径。
+    目录路径: 
+    指定要压缩的图片所在的文件夹路径。
+    允许输入第二个目录路径作为输出文件夹路径
+
     数字参数:
     0 < 数字 < 10: 设置图片的最大体积（以MB为单位）。
     数字 > 100: 设置图片的最大分辨率（以像素为单位）。
@@ -182,17 +185,18 @@ if __name__ == "__main__":
     version = "2.1"
     folder_path = "0"
     output_folder_path = "0"
-    limit_size = 0.25
+    limit_size = 4
     limit_resolution = 0
     overwrite = False
     recursive = False
+    is_first_path = true # 将第一个路径即为输入路径，第二个路径记为输出路径
     if len(sys.argv) == 1:
         print(help_information)
         exit()
 
     for arg in sys.argv[1:]:
         dig_num = digit_count(arg) if arg[0] != '.' else 0 # 相对路径会遇到第一个是点的问题
-        if dig_num:  # 这里需要添加小数点和mb p 的判断
+        if dig_num: 
             f_arg = float(arg[:dig_num])
             if 0 < f_arg < 10:
                 limit_size = f_arg
@@ -200,7 +204,11 @@ if __name__ == "__main__":
                 limit_resolution = int(f_arg)
         else:
             if os.path.isdir(arg):
-                folder_path = arg
+                if is_first_path:
+                    folder_path = arg
+                    is_first_path = False
+                else:
+                    output_folder_path = arg
             elif arg == "--overwrite":
                 overwrite = True
             elif arg == "--recursive":
