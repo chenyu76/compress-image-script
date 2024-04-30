@@ -5,34 +5,58 @@ import sys
 from PIL import Image
 from PIL import ImageOps
 
+
 # 递归压缩文件夹里的图片
-def compress_images_in_subfolder(input_path, output_path, file_size_limit = 4, image_resolution_limit = 0):
+def compress_images_in_subfolder(
+    input_path, output_path, file_size_limit=4, image_resolution_limit=0
+):
     subfolders = list_subfolders(input_path)
     for folder in subfolders:
-        compress_images_in_folder(folder, folder.replace(input_path, output_path), file_size_limit, image_resolution_limit)
+        compress_images_in_folder(
+            folder,
+            folder.replace(input_path, output_path),
+            file_size_limit,
+            image_resolution_limit,
+        )
     return 0
 
+
 # 递归压缩文件夹里的图片 方法2，应该更快一点，可惜不能用，需要修复
-def compress_images_in_subfolder2(input_path, output_path, file_size_limit = 4, image_resolution_limit = 0):
+def compress_images_in_subfolder2(
+    input_path, output_path, file_size_limit=4, image_resolution_limit=0
+):
     for item in os.listdir(input_path):
         if os.path.isdir(os.path.join(input_path, item)):
-            compress_images_in_subfolder(item, item.replace(input_path, output_path), file_size_limit, image_resolution_limit)
+            compress_images_in_subfolder(
+                item,
+                item.replace(input_path, output_path),
+                file_size_limit,
+                image_resolution_limit,
+            )
         elif os.path.isfile(os.path.join(input_path, item)):
-            compress_image(input_path, output_path, item, file_size_limit, image_resolution_limit)
+            compress_image(
+                input_path, output_path, item, file_size_limit, image_resolution_limit
+            )
     return 0
 
 
 # 压缩指定文件夹里的图片
-def compress_images_in_folder(input_path, output_path, file_size_limit = 4, image_resolution_limit = 0):
+def compress_images_in_folder(
+    input_path, output_path, file_size_limit=4, image_resolution_limit=0
+):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     for file in os.listdir(input_path):
         if os.path.isfile(os.path.join(input_path, file)):
-            compress_image(input_path, output_path, file, file_size_limit, image_resolution_limit)
+            compress_image(
+                input_path, output_path, file, file_size_limit, image_resolution_limit
+            )
     return 0
 
 
-def compress_image(input_path, output_path, image_name, file_size_limit = 4, image_resolution_limit = 0):
+def compress_image(
+    input_path, output_path, image_name, file_size_limit=4, image_resolution_limit=0
+):
     """压缩单张图片
 
     Args:
@@ -42,7 +66,7 @@ def compress_image(input_path, output_path, image_name, file_size_limit = 4, ima
     file_size_limit: 限制的文件大小
     photo_resolution_limit： 限制的图片尺寸
 
-    Returns: 
+    Returns:
     0： 无异常
     -1： 不是图片
     """
@@ -51,18 +75,21 @@ def compress_image(input_path, output_path, image_name, file_size_limit = 4, ima
     file_size_limit_MB = file_size_limit * 1024 * 1024
 
     # 每压缩一张打印一个点
-    #print(".",end="")
+    # print(".",end="")
 
     # 检测是否是图片
-    if not (os.path.isfile(image_path) and image_path.lower().endswith(('.png', '.jpg', '.jpeg', '.webp'))):
+    if not (
+        os.path.isfile(image_path)
+        and image_path.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
+    ):
         return -1
-    
+
     # 检测图片是否满足大小，满足就直接拷贝
     if os.path.getsize(image_path) < file_size_limit_MB and output_path != input_path:
         print(f"\rcopying {image_name}", end="")
         shutil.copy(image_path, image_output_path)
         return 0
-    
+
     # 图片需要压缩
     with Image.open(image_path) as img:
         inital_quality = 90
@@ -74,23 +101,34 @@ def compress_image(input_path, output_path, image_name, file_size_limit = 4, ima
 
         # 保留exif信息
         exif = "0"
-        if 'exif' in img.info.keys():
-            exif = img.info['exif']
-            
+        if "exif" in img.info.keys():
+            exif = img.info["exif"]
+
         # 压缩图片尺寸
-        if(image_resolution_limit > 0):
+        if image_resolution_limit > 0:
             img.thumbnail((image_resolution_limit, image_resolution_limit))
         img = img.convert("RGB")  # Convert to RGB if not already (for JPEG)
         img = ImageOps.exif_transpose(img)
         while True:
-            print(f"\rcompressing {image_name} {compress_time}th time, quality: {inital_quality}", end="")
+            print(
+                f"\rcompressing {image_name} {compress_time}th time, quality: {inital_quality}",
+                end="",
+            )
             if exif == "0":
-                img.save(image_output_path, "JPEG", quality=inital_quality, optimize=True)
+                img.save(
+                    image_output_path, "JPEG", quality=inital_quality, optimize=True
+                )
             else:
-                img.save(image_output_path, "JPEG", quality=inital_quality, optimize=True, exif=exif)
+                img.save(
+                    image_output_path,
+                    "JPEG",
+                    quality=inital_quality,
+                    optimize=True,
+                    exif=exif,
+                )
             inital_quality -= 5
             compress_time += 1
-            if(os.path.getsize(image_output_path) < file_size_limit_MB):
+            if os.path.getsize(image_output_path) < file_size_limit_MB:
                 break
 
     return 0
@@ -111,8 +149,12 @@ def list_subfolders(directory):
             subfolders.append(os.path.join(root, dir))
     return subfolders
 
+# 统计一个字符串从头开始数，出现的数字（包括小数点）次数
+def digit_count(str, num = 0):
+    return digit_count(str[1:], num+1) if str[0] in '1234567890.' else num
+
 if __name__ == "__main__":
-    help_information = '''
+    help_information = """
     使用说明（by ChatGPT 4）：
 
     这是一个图片压缩工具，可以压缩指定文件夹中的所有图片。您可以设置图片的最大体积和分辨率，并选择是否覆盖原图或保存到不同的文件夹。
@@ -136,11 +178,11 @@ if __name__ == "__main__":
     - 必须提供至少一个文件夹路径。
     - 如果未设置大小和分辨率限制，程序将使用默认设置(4MB，无分辨率限制)。
     - 参数无先后顺序限制
-    '''
-    version = '2.1'
+    """
+    version = "2.1"
     folder_path = "0"
     output_folder_path = "0"
-    limit_size = 4
+    limit_size = 0.25
     limit_resolution = 0
     overwrite = False
     recursive = False
@@ -149,12 +191,13 @@ if __name__ == "__main__":
         exit()
 
     for arg in sys.argv[1:]:
-        if arg.isdigit():
-            f_arg = float(arg)
+        dig_num = digit_count(arg) if arg[0] != '.' else 0 # 相对路径会遇到第一个是点的问题
+        if dig_num:  # 这里需要添加小数点和mb p 的判断
+            f_arg = float(arg[:dig_num])
             if 0 < f_arg < 10:
                 limit_size = f_arg
             elif 100 < f_arg:
-                limit_resolution =int(f_arg)
+                limit_resolution = int(f_arg)
         else:
             if os.path.isdir(arg):
                 folder_path = arg
@@ -176,11 +219,11 @@ if __name__ == "__main__":
                         print(help_information)
                     elif c == "v":
                         print("version:" + version)
-            
+
     if folder_path == "0":
         print("必须提供需要压缩的图片的目录！")
         exit()
-    
+
     if overwrite:
         output_folder_path = folder_path
     else:
@@ -191,11 +234,11 @@ if __name__ == "__main__":
             os.makedirs(output_folder_path)
 
     # 打印配置信息
-    print(f"将压缩文件夹 \"{folder_path}\" 里的图片")
+    print(f'将压缩文件夹 "{folder_path}" 里的图片')
     if overwrite:
         print("覆盖此文件夹中原始图片")
     else:
-        print(f"保存至 \"{output_folder_path}\" ")
+        print(f'保存至 "{output_folder_path}" ')
     print(f"限制大小{limit_size}MB，", end="")
     if limit_resolution == 0:
         print("不限制尺寸")
@@ -203,9 +246,12 @@ if __name__ == "__main__":
         print(f"图片尺寸限制为{limit_resolution}x{limit_resolution}以内")
 
     if recursive:
-        compress_images_in_subfolder(folder_path, output_folder_path, limit_size, limit_resolution)
+        compress_images_in_subfolder(
+            folder_path, output_folder_path, limit_size, limit_resolution
+        )
     else:
-        compress_images_in_folder(folder_path, output_folder_path, limit_size, limit_resolution)
-    
+        compress_images_in_folder(
+            folder_path, output_folder_path, limit_size, limit_resolution
+        )
+
     print("完成")
-        
