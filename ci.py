@@ -189,7 +189,7 @@ if __name__ == "__main__":
     limit_resolution = 0
     overwrite = False
     recursive = False
-    is_first_path = true # 将第一个路径即为输入路径，第二个路径记为输出路径
+    is_first_path = True # 将第一个路径即为输入路径，第二个路径记为输出路径
     if len(sys.argv) == 1:
         print(help_information)
         exit()
