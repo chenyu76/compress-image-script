@@ -1,4 +1,4 @@
-A Python script for batch compression of images that I use myself. can control the target compression size of images.
+A Python script(`ci.py`) for batch compression of images that I use myself. can control the target compression size of images.
 
 Use `ci.py --help` to view the usage help. (only in Chinese)
 
@@ -6,7 +6,7 @@ Use `ci.py --help` to view the usage help. (only in Chinese)
 
 ---
 
-自己用的批量压缩图片Python脚本，特点在于可以控制图片目标压缩大小。
+自己用的批量压缩图片Python脚本(`ci.py`)，特点在于可以控制图片目标压缩大小。
 
 使用`ci.py --help`查看使用帮助。
 
