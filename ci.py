@@ -149,9 +149,15 @@ def list_subfolders(directory):
             subfolders.append(os.path.join(root, dir))
     return subfolders
 
+
 # 统计一个字符串从头开始数，出现的数字（包括小数点）次数
-def digit_count(str, num = 0):
-    return digit_count(str[1:], num+1) if str[0] in '1234567890.' else num
+def digit_count(str, num=0):
+    return (
+        digit_count(str[1:], num + 1)
+        if len(str) != 0 and str[0] in "1234567890."
+        else num
+    )
+
 
 if __name__ == "__main__":
     help_information = """
@@ -189,14 +195,16 @@ if __name__ == "__main__":
     limit_resolution = 0
     overwrite = False
     recursive = False
-    is_first_path = True # 将第一个路径即为输入路径，第二个路径记为输出路径
+    is_first_path = True  # 将第一个路径即为输入路径，第二个路径记为输出路径
     if len(sys.argv) == 1:
         print(help_information)
         exit()
 
     for arg in sys.argv[1:]:
-        dig_num = digit_count(arg) if arg[0] != '.' else 0 # 相对路径会遇到第一个是点的问题
-        if dig_num: 
+        dig_num = (
+            digit_count(arg) if arg[0] != "." else 0
+        )  # 相对路径会遇到第一个是点的问题
+        if dig_num:
             f_arg = float(arg[:dig_num])
             if 0 < f_arg < 10:
                 limit_size = f_arg
